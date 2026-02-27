@@ -1,0 +1,8 @@
+# MATLAB Requirements
+MATLAB R2018b or later
+Parallel Computing Toolbox
+Image Processing Toolbox
+
+# File Format Support
+HDF5 (built-in MATLAB support)
+XDMF-compatible visualization software (e.g., ParaView)

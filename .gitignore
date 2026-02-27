@@ -1,0 +1,4 @@
+*.zip
+*.h5
+*.xdmf
+.DS_Store

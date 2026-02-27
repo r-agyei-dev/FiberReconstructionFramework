@@ -1,0 +1,324 @@
+%% This mfile corrects the split fibers to be used for the reconstruction 
+
+% hh = 74066;   ii = 1; 86370
+% [numel_fib] = count_elements_cat_var(Linear_Index_center_GLOBAL);
+
+
+function [varargout] = SPLITTER_CORRECTOR_FUNC_B(varargin)
+
+Linear_Index_center_GLOBAL       =    varargin{1};
+ORIGI_Centroid_MID_cel           =    varargin{2};
+Pixel_Idx_cell_GLOBAL            =    varargin{3};
+height_variable                  =    varargin{4};
+
+
+
+% minor_axis_length_extract        =    varargin{2};
+
+Linear_Index_center_GLOBAL_NEW          =      cell(1,size(Linear_Index_center_GLOBAL,2));
+% minor_axis_length_extract_NEW           =      cell(1,size(Linear_Index_center_GLOBAL,2));
+ORIGI_Centroid_MID_cel_NEW              =      cell(1,size(Linear_Index_center_GLOBAL,2));
+
+
+
+% [~,~,height_variable]     =   cellfun(@(x)ind2sub(size_length,x),Linear_Index_center_GLOBAL,'uni',0);
+
+
+for ii = 1:size(Linear_Index_center_GLOBAL,2)
+    
+%    sprintf('%s%d','begin splitter corrector for fiber index ', ii)
+    
+        if ~iscell(Linear_Index_center_GLOBAL{ii})
+
+                                    linear_vec_tmp                =     Linear_Index_center_GLOBAL{ii}; 
+                                    height_vec_tmp                =     height_variable{ii};
+                                    ORIGI_Centroid_MID_cel_tmp    =     ORIGI_Centroid_MID_cel{ii};
+                                    unique_height_vec             =     unique(height_vec_tmp);            
+                                    pptt                          =     Pixel_Idx_cell_GLOBAL{ii};
+                                    
+                                    if ~iscell(pptt)
+                                        pptt = {pptt};
+                                    end
+                                    
+                                    intersect_var                 =     cell2mat(cellfun(@(x,y)~isempty(intersect(x,y)),pptt(1:end-1),pptt(2:end),'uni',0));
+
+                                    numel_idx = 1:numel(Pixel_Idx_cell_GLOBAL{ii});
+                                    if any(intersect_var == 0)
+                                          [chunks_fibers_idx_cell_1] =  zeros_function_locater(intersect_var); 
+                                           chunks_fibers_idx_cell_1  =  cellfun(@(x)[x x(end)+1],chunks_fibers_idx_cell_1,'uni',0);  
+                                           chunks_fibers_idx_cell_2  =  [chunks_fibers_idx_cell_1    num2cell(numel_idx(~ismember(numel_idx,[chunks_fibers_idx_cell_1{:}])),1)];  
+                                           chunks_fibers_idx_cell_2  =  cellfun(@(x)unique_height_vec(x),chunks_fibers_idx_cell_2,'uni',0); 
+
+                                           % break the variables of the respective terms 
+                                           % (a) Linear_Index_center_GLOBAL_NEW
+                                           Linear_Index_center_GLOBAL_NEW{ii}        =     cellfun(@(x)linear_vec_tmp(ismember(height_vec_tmp,x)),chunks_fibers_idx_cell_2,'uni',0);
+
+                                           % (b) minor_axis_length_extract_NEW
+%                                            minor_axis_length_extract_NEW{ii}         =     cellfun(@(x)minor_vec_tmp(ismember(unique_height_vec,x)),chunks_fibers_idx_cell_2,'uni',0);
+
+%                                            % (c) Centroid_MID_cell_NEW
+%                                            Fitted_Centroid_MID_cell_NEW{ii}                 =     cellfun(@(x)Fitted_Centroid_MID_cell_tmp(ismember(unique_height_vec,x),:),chunks_fibers_idx_cell_2,'uni',0);           
+
+                                           % (d) ORIGI_Centroid_MID_cel_NEW
+                                           ORIGI_Centroid_MID_cel_NEW{ii}            =     cellfun(@(x)ORIGI_Centroid_MID_cel_tmp(ismember(unique_height_vec,x),:),chunks_fibers_idx_cell_2,'uni',0);           
+
+                                    else 
+                                        
+                                        % Do NOT break the variables of the respective terms
+                                        
+                                        % (a) Linear_Index_center_GLOBAL_NEW
+                                        Linear_Index_center_GLOBAL_NEW{ii}           =     linear_vec_tmp;
+
+                                        % (b) minor_axis_length_extract_NEW
+%                                         minor_axis_length_extract_NEW{ii}            =     minor_vec_tmp;
+
+%                                         % (c) Centroid_MID_cell_NEW
+%                                         Fitted_Centroid_MID_cell_NEW{ii}                    =     Fitted_Centroid_MID_cell_tmp;
+
+                                        % (d) ORIGI_Centroid_MID_cel_NEW
+                                        ORIGI_Centroid_MID_cel_NEW{ii}               =     ORIGI_Centroid_MID_cel_tmp;     
+                                                                                                                         
+                                    end
+        else 
+            
+
+                    for jj = 1:numel(Linear_Index_center_GLOBAL{ii})
+
+                                    linear_vec_tmp                =     Linear_Index_center_GLOBAL{ii}{jj};
+                                    height_vec_tmp                =     height_variable{ii}{jj};
+%                                     minor_vec_tmp                 =     minor_axis_length_extract{ii}{jj};
+%                                     Centroid_MID_cell_tmp         =     Fitted_Centroid_MID_cell{ii}{jj};
+                                    ORIGI_Centroid_MID_cel_tmp    =     ORIGI_Centroid_MID_cel{ii}{jj};
+                                    unique_height_vec             =     unique(height_vec_tmp);
+                                    pptt                          =     Pixel_Idx_cell_GLOBAL{ii}{jj};
+                                    
+                                    if ~iscell(pptt)
+                                        pptt = {pptt};
+                                    end                                    
+                                             
+                                    intersect_var                 =     cell2mat(cellfun(@(x,y)~isempty(intersect(x,y)),pptt(1:end-1),pptt(2:end),'uni',0));
+
+                                    
+                                    numel_idx = 1:numel(Pixel_Idx_cell_GLOBAL{ii}{jj});
+                                    if any(intersect_var == 0)
+                                        [chunks_fibers_idx_cell_1] =  zeros_function_locater(intersect_var);
+                                        chunks_fibers_idx_cell_1  =  cellfun(@(x)[x x(end)+1],chunks_fibers_idx_cell_1,'uni',0);
+                                        chunks_fibers_idx_cell_2  =  [chunks_fibers_idx_cell_1    num2cell(numel_idx(~ismember(numel_idx,[chunks_fibers_idx_cell_1{:}])),1)];
+                                        chunks_fibers_idx_cell_2  =  cellfun(@(x)unique_height_vec(x),chunks_fibers_idx_cell_2,'uni',0);
+
+                                        % break the variables of the respective terms
+                                        % (a) Linear_Index_center_GLOBAL_NEW
+                                        Linear_Index_center_GLOBAL_NEW{ii}{jj}    =     cellfun(@(x)linear_vec_tmp(ismember(height_vec_tmp,x)),chunks_fibers_idx_cell_2,'uni',0);
+
+                                        % (b) minor_axis_length_extract_NEW
+%                                         minor_axis_length_extract_NEW{ii}{jj}     =     cellfun(@(x)minor_vec_tmp(ismember(unique_height_vec,x)),chunks_fibers_idx_cell_2,'uni',0);
+
+%                                         % (c) Centroid_MID_cell_NEW
+%                                         Fitted_Centroid_MID_cell_NEW{ii}{jj}             =     cellfun(@(x)Centroid_MID_cell_tmp(ismember(unique_height_vec,x),:),chunks_fibers_idx_cell_2,'uni',0);
+
+                                        % (d) ORIGI_Centroid_MID_cel_NEW
+                                        ORIGI_Centroid_MID_cel_NEW{ii}{jj}        =     cellfun(@(x)ORIGI_Centroid_MID_cel_tmp(ismember(unique_height_vec,x),:),chunks_fibers_idx_cell_2,'uni',0);
+
+                                    else 
+                                        
+                                        % Do NOT break the variables of the respective terms
+                                        
+                                        % (a) Linear_Index_center_GLOBAL_NEW
+                                        Linear_Index_center_GLOBAL_NEW{ii}{jj}    =     linear_vec_tmp;
+
+                                        % (b) minor_axis_length_extract_NEW
+%                                         minor_axis_length_extract_NEW{ii}{jj}     =     minor_vec_tmp;
+
+%                                         % (c) Centroid_MID_cell_NEW
+%                                         Fitted_Centroid_MID_cell_NEW{ii}{jj}             =     Centroid_MID_cell_tmp;
+
+                                        % (d) ORIGI_Centroid_MID_cel_NEW
+                                        ORIGI_Centroid_MID_cel_NEW{ii}{jj}        =     ORIGI_Centroid_MID_cel_tmp;
+                                        
+                                    end                                                                      
+                    end
+
+        end
+        
+clearvars    chunks_fibers_idx_cell_1     chunks_fibers_idx_cell_2       linear_vec_tmp                     height_vec_tmp 
+clearvars    minor_vec_tmp                Centroid_MID_cell_tmp          ORIGI_Centroid_MID_cel_tmp         unique_height_vec
+clearvars    pptt                         intersect_var             
+
+% sprintf('%s%d','end splitter corrector for fiber index ', ii)
+
+end
+
+varargout{            1}       =     Linear_Index_center_GLOBAL_NEW;
+% varargout{        end+1}       =     minor_axis_length_extract_NEW;
+varargout{        end+1}       =     ORIGI_Centroid_MID_cel_NEW;
+
+
+% varargout{        end+1}       =     Fitted_Centroid_MID_cell_NEW;
+end
+
+
+
+
+
+
+%%
+% %% This mfile corrects the split fibers to be used for the reconstruction 
+% 
+% % hh = 74066;   ii = 1; 86370
+% % [numel_fib] = count_elements_cat_var(Linear_Index_center_GLOBAL);
+% 
+% 
+% function [varargout] = SPLITTER_CORRECTOR_FUNC_B(varargin)
+% 
+% Linear_Index_center_GLOBAL       =    varargin{1};
+% ORIGI_Centroid_MID_cel           =    varargin{2};
+% Pixel_Idx_cell_GLOBAL            =    varargin{3};
+% height_variable                  =    varargin{4};
+% 
+% 
+% 
+% % minor_axis_length_extract        =    varargin{2};
+% 
+% Linear_Index_center_GLOBAL_NEW          =      cell(1,size(Linear_Index_center_GLOBAL,2));
+% % minor_axis_length_extract_NEW           =      cell(1,size(Linear_Index_center_GLOBAL,2));
+% ORIGI_Centroid_MID_cel_NEW              =      cell(1,size(Linear_Index_center_GLOBAL,2));
+% 
+% 
+% 
+% % [~,~,height_variable]     =   cellfun(@(x)ind2sub(size_length,x),Linear_Index_center_GLOBAL,'uni',0);
+% 
+% 
+% for ii = 1:size(Linear_Index_center_GLOBAL,2)
+%     
+% %    sprintf('%s%d','begin splitter corrector for fiber index ', ii)
+%     
+%         if ~iscell(Linear_Index_center_GLOBAL{ii})
+% 
+%                                     linear_vec_tmp                =     Linear_Index_center_GLOBAL{ii}; 
+%                                     height_vec_tmp                =     height_variable{ii};
+% %                                     minor_vec_tmp                 =     minor_axis_length_extract{ii};
+% %                                     Fitted_Centroid_MID_cell_tmp  =     Fitted_Centroid_MID_cell{ii};
+%                                     ORIGI_Centroid_MID_cel_tmp    =     ORIGI_Centroid_MID_cel{ii};
+%                                     unique_height_vec             =     unique(height_vec_tmp);            
+%                                     pptt                          =     Pixel_Idx_cell_GLOBAL{ii};
+%                                     
+%                                     if ~iscell(pptt)
+%                                         pptt = {pptt};
+%                                     end
+%                                     
+%                                     intersect_var                 =     cell2mat(cellfun(@(x,y)~isempty(intersect(x,y)),pptt(1:end-1),pptt(2:end),'uni',0));
+% 
+%                                     numel_idx = 1:numel(Pixel_Idx_cell_GLOBAL{ii});
+%                                     if any(intersect_var == 0)
+%                                           [chunks_fibers_idx_cell_1] =  zeros_function_locater(intersect_var); 
+%                                            chunks_fibers_idx_cell_1  =  cellfun(@(x)[x x(end)+1],chunks_fibers_idx_cell_1,'uni',0);  
+%                                            chunks_fibers_idx_cell_2  =  [chunks_fibers_idx_cell_1    num2cell(numel_idx(~ismember(numel_idx,[chunks_fibers_idx_cell_1{:}])),1)];  
+%                                            chunks_fibers_idx_cell_2  =  cellfun(@(x)unique_height_vec(x),chunks_fibers_idx_cell_2,'uni',0); 
+% 
+%                                            % break the variables of the respective terms 
+%                                            % (a) Linear_Index_center_GLOBAL_NEW
+%                                            Linear_Index_center_GLOBAL_NEW{ii}        =     cellfun(@(x)linear_vec_tmp(ismember(height_vec_tmp,x)),chunks_fibers_idx_cell_2,'uni',0);
+% 
+%                                            % (b) minor_axis_length_extract_NEW
+% %                                            minor_axis_length_extract_NEW{ii}         =     cellfun(@(x)minor_vec_tmp(ismember(unique_height_vec,x)),chunks_fibers_idx_cell_2,'uni',0);
+% 
+% %                                            % (c) Centroid_MID_cell_NEW
+% %                                            Fitted_Centroid_MID_cell_NEW{ii}                 =     cellfun(@(x)Fitted_Centroid_MID_cell_tmp(ismember(unique_height_vec,x),:),chunks_fibers_idx_cell_2,'uni',0);           
+% 
+%                                            % (d) ORIGI_Centroid_MID_cel_NEW
+%                                            ORIGI_Centroid_MID_cel_NEW{ii}            =     cellfun(@(x)ORIGI_Centroid_MID_cel_tmp(ismember(unique_height_vec,x),:),chunks_fibers_idx_cell_2,'uni',0);           
+% 
+%                                     else 
+%                                         
+%                                         % Do NOT break the variables of the respective terms
+%                                         
+%                                         % (a) Linear_Index_center_GLOBAL_NEW
+%                                         Linear_Index_center_GLOBAL_NEW{ii}           =     linear_vec_tmp;
+% 
+%                                         % (b) minor_axis_length_extract_NEW
+% %                                         minor_axis_length_extract_NEW{ii}            =     minor_vec_tmp;
+% 
+% %                                         % (c) Centroid_MID_cell_NEW
+% %                                         Fitted_Centroid_MID_cell_NEW{ii}                    =     Fitted_Centroid_MID_cell_tmp;
+% 
+%                                         % (d) ORIGI_Centroid_MID_cel_NEW
+%                                         ORIGI_Centroid_MID_cel_NEW{ii}               =     ORIGI_Centroid_MID_cel_tmp;     
+%                                                                                                                          
+%                                     end
+%         else 
+%             
+% 
+%                     for jj = 1:numel(Linear_Index_center_GLOBAL{ii})
+% 
+%                                     linear_vec_tmp                =     Linear_Index_center_GLOBAL{ii}{jj};
+%                                     height_vec_tmp                =     height_variable{ii}{jj};
+% %                                     minor_vec_tmp                 =     minor_axis_length_extract{ii}{jj};
+% %                                     Centroid_MID_cell_tmp         =     Fitted_Centroid_MID_cell{ii}{jj};
+%                                     ORIGI_Centroid_MID_cel_tmp    =     ORIGI_Centroid_MID_cel{ii}{jj};
+%                                     unique_height_vec             =     unique(height_vec_tmp);
+%                                     pptt                          =     Pixel_Idx_cell_GLOBAL{ii}{jj};
+%                                     
+%                                     if ~iscell(pptt)
+%                                         pptt = {pptt};
+%                                     end                                    
+%                                              
+%                                     intersect_var                 =     cell2mat(cellfun(@(x,y)~isempty(intersect(x,y)),pptt(1:end-1),pptt(2:end),'uni',0));
+% 
+%                                     
+%                                     numel_idx = 1:numel(Pixel_Idx_cell_GLOBAL{ii}{jj});
+%                                     if any(intersect_var == 0)
+%                                         [chunks_fibers_idx_cell_1] =  zeros_function_locater(intersect_var);
+%                                         chunks_fibers_idx_cell_1  =  cellfun(@(x)[x x(end)+1],chunks_fibers_idx_cell_1,'uni',0);
+%                                         chunks_fibers_idx_cell_2  =  [chunks_fibers_idx_cell_1    num2cell(numel_idx(~ismember(numel_idx,[chunks_fibers_idx_cell_1{:}])),1)];
+%                                         chunks_fibers_idx_cell_2  =  cellfun(@(x)unique_height_vec(x),chunks_fibers_idx_cell_2,'uni',0);
+% 
+%                                         % break the variables of the respective terms
+%                                         % (a) Linear_Index_center_GLOBAL_NEW
+%                                         Linear_Index_center_GLOBAL_NEW{ii}{jj}    =     cellfun(@(x)linear_vec_tmp(ismember(height_vec_tmp,x)),chunks_fibers_idx_cell_2,'uni',0);
+% 
+%                                         % (b) minor_axis_length_extract_NEW
+% %                                         minor_axis_length_extract_NEW{ii}{jj}     =     cellfun(@(x)minor_vec_tmp(ismember(unique_height_vec,x)),chunks_fibers_idx_cell_2,'uni',0);
+% 
+% %                                         % (c) Centroid_MID_cell_NEW
+% %                                         Fitted_Centroid_MID_cell_NEW{ii}{jj}             =     cellfun(@(x)Centroid_MID_cell_tmp(ismember(unique_height_vec,x),:),chunks_fibers_idx_cell_2,'uni',0);
+% 
+%                                         % (d) ORIGI_Centroid_MID_cel_NEW
+%                                         ORIGI_Centroid_MID_cel_NEW{ii}{jj}        =     cellfun(@(x)ORIGI_Centroid_MID_cel_tmp(ismember(unique_height_vec,x),:),chunks_fibers_idx_cell_2,'uni',0);
+% 
+%                                     else 
+%                                         
+%                                         % Do NOT break the variables of the respective terms
+%                                         
+%                                         % (a) Linear_Index_center_GLOBAL_NEW
+%                                         Linear_Index_center_GLOBAL_NEW{ii}{jj}    =     linear_vec_tmp;
+% 
+%                                         % (b) minor_axis_length_extract_NEW
+% %                                         minor_axis_length_extract_NEW{ii}{jj}     =     minor_vec_tmp;
+% 
+% %                                         % (c) Centroid_MID_cell_NEW
+% %                                         Fitted_Centroid_MID_cell_NEW{ii}{jj}             =     Centroid_MID_cell_tmp;
+% 
+%                                         % (d) ORIGI_Centroid_MID_cel_NEW
+%                                         ORIGI_Centroid_MID_cel_NEW{ii}{jj}        =     ORIGI_Centroid_MID_cel_tmp;
+%                                         
+%                                     end                                                                      
+%                     end
+% 
+%         end
+%         
+% clearvars    chunks_fibers_idx_cell_1     chunks_fibers_idx_cell_2       linear_vec_tmp                     height_vec_tmp 
+% clearvars    minor_vec_tmp                Centroid_MID_cell_tmp          ORIGI_Centroid_MID_cel_tmp         unique_height_vec
+% clearvars    pptt                         intersect_var             
+% 
+% % sprintf('%s%d','end splitter corrector for fiber index ', ii)
+% 
+% end
+% 
+% varargout{            1}       =     Linear_Index_center_GLOBAL_NEW;
+% % varargout{        end+1}       =     minor_axis_length_extract_NEW;
+% varargout{        end+1}       =     ORIGI_Centroid_MID_cel_NEW;
+% 
+% 
+% % varargout{        end+1}       =     Fitted_Centroid_MID_cell_NEW;
+% end
+% 
